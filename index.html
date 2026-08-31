@@ -185,6 +185,7 @@
             </select>
           </div>
           <div class="full"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="(704) 555-0123" required></div>
+          <div class="full" style="position:absolute;left:-9999px" aria-hidden="true"><label for="company">Company</label><input id="company" tabindex="-1" autocomplete="off"></div>
         </div>
         <button class="pill" type="submit">Get my free quote →</button>
         <div class="micro">Prefer to talk? <a href="tel:+17045550185">Call (704) 555-0185</a> — open 24 hours.</div>
@@ -281,9 +282,31 @@
 </div>
 
 <script>
-  document.getElementById('qform').addEventListener('submit',function(e){
+  document.getElementById('qform').addEventListener('submit', async function(e){
     e.preventDefault();
-    document.querySelector('.quote-card').classList.add('sent');
+    var btn = this.querySelector('button[type=submit]');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      var res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          moving_from: document.getElementById('from').value,
+          moving_to: document.getElementById('to').value,
+          move_date: document.getElementById('date').value,
+          home_size: document.getElementById('size').value,
+          phone: document.getElementById('phone').value,
+          company: document.getElementById('company').value
+        })
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      document.querySelector('.quote-card').classList.add('sent');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Get my free quote →';
+      alert("Something went wrong sending your request — please call (704) 555-0185 and we'll take care of you.");
+    }
   });
 </script>
 

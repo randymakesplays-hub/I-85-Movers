@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>I-85 Movers — Leads</title>
+<style>
+  :root{--red:#C41230;--navy:#1B3F8B;--navy-deep:#12294f;--tint:#f3f6fb;--ink:#1a1d24;--muted:#5c6470;--line:rgba(27,63,139,.14)}
+  *{box-sizing:border-box;margin:0}
+  body{font-family:'DM Sans',system-ui,sans-serif;font-size:15px;color:var(--ink);background:var(--tint);padding:32px 20px}
+  .card{max-width:1100px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+  h1{font-size:22px;color:var(--navy-deep);margin-bottom:4px}
+  .sub{color:var(--muted);font-size:13.5px;margin-bottom:20px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  input{flex:1;min-width:220px;font-size:15px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--tint)}
+  button,.btn{background:var(--red);color:#fff;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:10px 22px;cursor:pointer;text-decoration:none;display:inline-block}
+  button.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  tr:hover td{background:var(--tint)}
+  .empty,.err{padding:26px;text-align:center;color:var(--muted)}
+  .err{color:var(--red)}
+  .count{font-weight:700;color:var(--navy)}
+  .scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>I-85 Movers — Lead inbox</h1>
+  <div class="sub">Quote requests captured from the website, newest first. Export CSV to import into your CRM later.</div>
+  <div class="row">
+    <input id="key" type="password" placeholder="Admin key" autocomplete="current-password">
+    <button id="load">Load leads</button>
+    <button id="csv" class="ghost">Download CSV</button>
+  </div>
+  <div id="out" class="empty">Enter the admin key and hit “Load leads”.</div>
+</div>
+<script>
+  var keyEl = document.getElementById('key');
+  var out = document.getElementById('out');
+  try { keyEl.value = localStorage.getItem('i85_admin_key') || ''; } catch (e) {}
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  async function load(){
+    var key = keyEl.value.trim();
+    if (!key) { out.className='err'; out.textContent='Enter the admin key first.'; return; }
+    try { localStorage.setItem('i85_admin_key', key); } catch (e) {}
+    out.className='empty'; out.textContent='Loading…';
+    try {
+      var res = await fetch('/api/leads', { headers: { 'x-admin-key': key } });
+      var data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      if (!data.leads.length) { out.textContent = 'No leads yet.'; return; }
+      var rows = data.leads.map(function(l){
+        return '<tr><td>' + esc(new Date(l.created_at).toLocaleString()) + '</td><td>' + esc(l.moving_from) +
+          '</td><td>' + esc(l.moving_to) + '</td><td>' + esc(l.move_date) + '</td><td>' + esc(l.home_size) +
+          '</td><td><a href="tel:' + esc(l.phone) + '">' + esc(l.phone) + '</a></td></tr>';
+      }).join('');
+      out.className='scroll';
+      out.innerHTML = '<div class="sub"><span class="count">' + data.count + '</span> lead(s)</div>' +
+        '<table><thead><tr><th>Received</th><th>From</th><th>To</th><th>Move date</th><th>Size</th><th>Phone</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>';
+    } catch (err) {
+      out.className='err'; out.textContent = 'Could not load leads: ' + err.message;
+    }
+  }
+
+  document.getElementById('load').addEventListener('click', load);
+  keyEl.addEventListener('keydown', function(e){ if (e.key === 'Enter') load(); });
+  document.getElementById('csv').addEventListener('click', function(){
+    var key = keyEl.value.trim();
+    if (!key) { out.className='err'; out.textContent='Enter the admin key first.'; return; }
+    window.location = '/api/leads?format=csv&key=' + encodeURIComponent(key);
+  });
+</script>
+</body>
+</html>
