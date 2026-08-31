@@ -1,0 +1,12 @@
+{
+  "name": "i-85-movers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "I-85 Movers — local, long-distance and international moving on the I-85 corridor",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
