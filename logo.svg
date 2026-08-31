@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 232">
+  <title>I-85 Movers</title>
+  <path d="M100 4 C120 19 154 25 196 21 C203 86 197 158 100 228 C3 158 -3 86 4 21 C46 25 80 19 100 4 Z" fill="#fff"/>
+  <clipPath id="inner"><path d="M100 15 C118 27 149 32 187 30 C192 88 186 150 100 216 C14 150 8 88 13 30 C51 32 82 27 100 15 Z"/></clipPath>
+  <g clip-path="url(#inner)">
+    <rect x="0" y="0" width="200" height="232" fill="#1B3F8B"/>
+    <path d="M0 0 H200 V64 Q100 76 0 64 Z" fill="#fff"/>
+    <path d="M0 0 H200 V58 Q100 70 0 58 Z" fill="#C41230"/>
+  </g>
+  <text x="100" y="53" text-anchor="middle" font-family="'Barlow Condensed','Arial Narrow',Arial,sans-serif" font-weight="700" font-size="33" fill="#fff" textLength="142" lengthAdjust="spacingAndGlyphs">INTERSTATE</text>
+  <text x="100" y="178" text-anchor="middle" font-family="'Barlow Condensed','Arial Narrow',Arial,sans-serif" font-weight="800" font-size="118" fill="#fff" textLength="122" lengthAdjust="spacingAndGlyphs">85</text>
+</svg>
